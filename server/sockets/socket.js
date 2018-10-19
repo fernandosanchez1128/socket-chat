@@ -20,9 +20,11 @@ io.on('connection', (client) => {
             })
         }
         let sala = usuario.sala;
-        let personas = usuarios.agregarPersona (client.id, usuario.nombre,sala)
+        usuarios.agregarPersona (client.id, usuario.nombre,sala)
+        let personas = usuarios.getPersonasPorSala(sala);
         client.join(sala)
-        client.broadcast.to(sala).emit('listaPersonas', usuarios.getPersonasPorSala(sala))
+        client.broadcast.to(sala).emit('listaPersonas', personas)
+        client.broadcast.to(sala).emit('crearMensaje',crearMensaje('Administrador', `${usuario.nombre} se unió el chat`))
         return callback ({
             error : false,
             personas
@@ -33,6 +35,7 @@ io.on('connection', (client) => {
         let persona = usuarios.getPersona(client.id)
         let mensaje = crearMensaje(persona.nombre, data.mensaje)
         client.broadcast.to(persona.sala).emit ('crearMensaje', mensaje)
+        callback (mensaje)
     })
 
     //mensajes privados
